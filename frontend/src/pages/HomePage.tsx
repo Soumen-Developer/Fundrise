@@ -146,7 +146,7 @@ const HomePage: React.FC = () => {
           </div>
           <Link
             to="/explore"
-            className="inline-flex items-center gap-1.5 text-primary font-semibold text-sm hover:underline"
+            className="inline-flex items-center gap-1.5 text-primary font-semibold text-sm hover:underline hover:text-primary-dark cursor-pointer"
           >
             Browse all campaigns <ArrowRight className="w-4 h-4" />
           </Link>
@@ -160,8 +160,8 @@ const HomePage: React.FC = () => {
               onClick={() => setSelectedCategory(cat.id)}
               className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
                 selectedCategory === cat.id
-                  ? 'bg-primary text-white shadow-sm'
-                  : 'bg-surface border border-border/60 text-text hover:bg-slate-50 dark:hover:bg-slate-800'
+                  ? 'bg-primary hover:bg-primary-dark text-white shadow-sm cursor-pointer'
+                  : 'bg-surface border border-border/60 text-text hover:bg-slate-100 hover:text-primary hover:border-primary/40 cursor-pointer'
               }`}
             >
               {cat.label}

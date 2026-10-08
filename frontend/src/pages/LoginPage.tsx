@@ -116,7 +116,29 @@ const LoginPage: React.FC = () => {
             <span className="font-semibold text-text">Demo Credentials:</span>
             <span className="text-[11px] text-text-secondary">Click to auto-fill</span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <button
+              type="button"
+              onClick={() => handleFillDemo('soumen@fundrise.com', 'soumen123')}
+              className="flex flex-col items-start p-2.5 rounded-lg bg-surface border border-border/60 text-text hover:border-primary hover:text-primary transition-colors text-xs font-medium cursor-pointer text-left"
+            >
+              <div className="flex items-center gap-1.5 font-semibold text-text">
+                <Shield className="w-3.5 h-3.5 text-emerald-500" /> Soumen
+              </div>
+              <span className="text-[11px] text-text-secondary mt-0.5 truncate w-full">soumen@fundrise.com</span>
+              <span className="text-[10px] text-text-secondary/80 font-mono">soumen123</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleFillDemo('yogiraj@fundrise.com', 'yogiraj123')}
+              className="flex flex-col items-start p-2.5 rounded-lg bg-surface border border-border/60 text-text hover:border-primary hover:text-primary transition-colors text-xs font-medium cursor-pointer text-left"
+            >
+              <div className="flex items-center gap-1.5 font-semibold text-text">
+                <Shield className="w-3.5 h-3.5 text-blue-500" /> Yogiraj
+              </div>
+              <span className="text-[11px] text-text-secondary mt-0.5 truncate w-full">yogiraj@fundrise.com</span>
+              <span className="text-[10px] text-text-secondary/80 font-mono">yogiraj123</span>
+            </button>
             <button
               type="button"
               onClick={() => handleFillDemo('admin@fundrise.com', 'admin123')}
@@ -127,17 +149,6 @@ const LoginPage: React.FC = () => {
               </div>
               <span className="text-[11px] text-text-secondary mt-0.5 truncate w-full">admin@fundrise.com</span>
               <span className="text-[10px] text-text-secondary/80 font-mono">admin123</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleFillDemo('soumen@fundrise.com', 'soumen123')}
-              className="flex flex-col items-start p-2.5 rounded-lg bg-surface border border-border/60 text-text hover:border-primary hover:text-primary transition-colors text-xs font-medium cursor-pointer text-left"
-            >
-              <div className="flex items-center gap-1.5 font-semibold text-text">
-                <Shield className="w-3.5 h-3.5 text-emerald-500" /> Soumen (Admin)
-              </div>
-              <span className="text-[11px] text-text-secondary mt-0.5 truncate w-full">soumen@fundrise.com</span>
-              <span className="text-[10px] text-text-secondary/80 font-mono">soumen123</span>
             </button>
             <button
               type="button"

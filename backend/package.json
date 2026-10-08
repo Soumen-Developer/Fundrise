@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.cjs",
     "dev": "nodemon server.cjs",
-    "seed": "node seed.js"
+    "seed": "node seed.js",
+    "postdeploy": "node scripts/postdeploy.js"
   },
   "keywords": [],
   "author": "",
@@ -25,7 +26,8 @@
     "morgan": "^1.12.1",
     "pg": "^8.23.1",
     "razorpay": "^2.9.8",
-    "sequelize": "^6.37.8"
+    "sequelize": "^6.37.8",
+    "sqlite3": "^6.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

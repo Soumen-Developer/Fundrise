@@ -4,7 +4,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 dotenv.config();
 
-const { sequelize } = require('./config/db.js');
+const { sequelize, connectDB } = require('./config/db.js');
 
 // Rate limiter for auth routes
 const authLimiter = rateLimit({
@@ -46,21 +46,30 @@ app.use('/api/updates', updateRoutes);
 app.use('/api/admin', adminRoutes);
 
 // Health check
-app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
+let isDbReady = false;
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    service: 'fundrise',
+    dbConnected: isDbReady,
+    uptime: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString(),
+  });
+});
 
 // Serve static files from React frontend in production
 if (process.env.NODE_ENV === 'production') {
   const path = require('path');
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+  const frontendDist = path.resolve(__dirname, '../frontend/dist');
+  console.log(`[Static] Serving frontend bundle from: ${frontendDist}`);
+  app.use(express.static(frontendDist));
 
-  // Catch-all route - return the index.html file for any non-API routes
-  // Make sure it does not intercept /api routes
-  app.get('/{*splat}', (req, res) => {
-    if (req.path.startsWith('/api')) {
-      res.status(404).json({ message: 'Route not found' });
-    } else {
-      res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
+  // Catch-all route for SPA navigation (never intercepts /api)
+  app.use((req, res, next) => {
+    if (req.method === 'GET' && !req.path.startsWith('/api')) {
+      return res.sendFile(path.join(frontendDist, 'index.html'));
     }
+    next();
   });
 }
 
@@ -73,32 +82,49 @@ app.use((req, res) => {
 const { errorHandler } = require('./middleware/errorHandler.js');
 app.use(errorHandler);
 
-// Start server
-const PORT = process.env.PORT || 5001;
+// Start server immediately on 0.0.0.0 so Render detects open port and healthcheck passes
+const PORT = process.env.PORT || 5000;
+const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 FundRise server listening on port ${PORT} (0.0.0.0)`);
+});
 
+// Asynchronously initialize database, migrations, and automated post-deployment seeding
 (async () => {
   try {
-    await sequelize.authenticate();
-    await sequelize.sync({ alter: true });
+    const connected = await connectDB();
+    if (connected) {
+      isDbReady = true;
 
-    // Auto-seed database if empty
-    try {
-      const { Campaign } = require('./models/index.js');
-      const count = await Campaign.count();
-      if (count === 0 || process.env.AUTO_SEED === 'true') {
-        console.log('Database empty or AUTO_SEED set, running seed script...');
-        const seed = require('./seed.js');
-        await seed();
+      // Automated post-deployment seeding check
+      try {
+        const { Campaign, User } = require('./models/index.js');
+        const count = await Campaign.count();
+        const adminCount = await User.count({ where: { role: 'admin' } });
+
+        if (count === 0 || adminCount < 2 || process.env.AUTO_SEED === 'true') {
+          console.log('[Post-Deploy] Running automated database seeding (admin accounts & demo campaigns)...');
+          const seed = require('./seed.js');
+          await seed();
+          console.log('✓ [Post-Deploy] Automated database seeding finished successfully!');
+        } else {
+          console.log(`[Post-Deploy] Database ready (${count} campaigns, ${adminCount} admins verified).`);
+        }
+      } catch (seedErr) {
+        console.warn('[Post-Deploy] Notice during auto-seeding:', seedErr.message);
       }
-    } catch (seedErr) {
-      console.warn('Auto-seed check notice:', seedErr.message);
+    } else {
+      console.warn('⚠️ [DB Warning] Database connection could not be established. Server is running in degraded mode.');
     }
-
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
   } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
+    console.error('[Startup Warning] Error during database initialization:', error.message);
   }
 })();
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM signal received: closing HTTP server...');
+  server.close(() => {
+    console.log('HTTP server closed.');
+    sequelize.close().then(() => process.exit(0));
+  });
+});

@@ -3,15 +3,28 @@
   "version": "1.0.0",
   "description": "FundRise - Modern Crowdfunding Platform",
   "scripts": {
-    "postinstall": "npm --prefix backend install && npm --prefix frontend install",
-    "install:all": "npm --prefix backend install && npm --prefix frontend install",
-    "build": "npm --prefix frontend run build",
-    "start": "node backend/server.cjs",
+    "clean:ports": "npx --yes kill-port 5000 5001 5173 5174 || true",
+    "dev": "npm run clean:ports && concurrently -k -p \"[{name}]\" -n \"BACKEND,FRONTEND\" -c \"cyan.bold,green.bold\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:all": "npm run dev",
     "dev:backend": "npm --prefix backend run dev",
     "dev:frontend": "npm --prefix frontend run dev",
-    "seed": "npm --prefix backend run seed"
+    "build": "npm --prefix frontend run build",
+    "start": "node backend/server.cjs",
+    "postinstall": "npm --prefix backend install && npm --prefix frontend install",
+    "install:all": "npm --prefix backend install && npm --prefix frontend install",
+    "seed": "npm --prefix backend run seed",
+    "postdeploy": "npm --prefix backend run postdeploy"
   },
-  "keywords": ["crowdfunding", "donation", "react", "express", "postgresql"],
+  "keywords": [
+    "crowdfunding",
+    "donation",
+    "react",
+    "express",
+    "postgresql"
+  ],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^10.0.5"
+  }
 }

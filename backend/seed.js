@@ -160,7 +160,7 @@ const seed = async () => {
       {
         title: 'Open Source Assistive Device for Visually Impaired',
         description: 'Developing affordable AI-powered ultrasonic navigation glasses for blind students.',
-        story: `Commercial assistive glasses cost over $1,500, putting them out of reach for 99% of blind individuals in developing nations.\n\nOur open-hardware project combines spatial audio sensors, haptic feedback, and edge AI to detect obstacles and read street signs in real time.\n\nHelp us fund the prototype molds and distribute 100 free units to blind students.`,
+        story: `Commercial assistive glasses cost over ₹1,20,000, putting them out of reach for 99% of blind individuals in developing nations.\n\nOur open-hardware project combines spatial audio sensors, haptic feedback, and edge AI to detect obstacles and read street signs in real time.\n\nHelp us fund the prototype molds and distribute 100 free units to blind students.`,
         category: 'creative',
         goalAmount: 150000,
         raisedAmount: 76000,

@@ -60,20 +60,20 @@ const Navbar: React.FC<NavbarProps> = ({ user, role, logout }) => {
               {role === 'admin' && (
                 <Link
                   to="/admin"
-                  className="text-xs inline-flex items-center gap-1 bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30 font-semibold px-2.5 py-1 rounded-full hover:bg-amber-500/25 transition-colors"
+                  className="text-xs inline-flex items-center gap-1 bg-amber-500/15 text-amber-700 dark:text-amber-700 border border-amber-500/30 font-semibold px-2.5 py-1 rounded-full hover:bg-amber-500/25 transition-colors"
                 >
                   <ShieldCheck className="w-3 h-3" /> Admin Panel
                 </Link>
               )}
-              <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800/80 border border-border/40 text-xs font-medium text-text">
-                <span className="w-4 h-4 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold">
+              <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-slate-50 border border-slate-200 shadow-xs text-xs font-medium text-slate-800">
+                <span className="w-5 h-5 rounded-full bg-primary text-white flex items-center justify-center text-[10px] font-bold shadow-xs">
                   {user.name?.charAt(0) || 'U'}
                 </span>
-                <span className="max-w-[120px] truncate">{user.name}</span>
+                <span className="max-w-[130px] truncate font-semibold text-slate-700">{user.name}</span>
               </div>
               <button
                 onClick={handleLogout}
-                className="text-xs font-semibold px-3 py-1.5 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
+                className="text-xs font-semibold px-3 py-1.5 rounded-lg text-rose-600 bg-rose-50/80 hover:bg-rose-100 border border-rose-200/60 transition-all cursor-pointer"
               >
                 Logout
               </button>
