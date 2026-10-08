@@ -1,5 +1,4 @@
 import React from 'react';
-import { User, MessageCircle, Clock } from 'lucide-react';
 
 interface CommentProps {
   userName: string;

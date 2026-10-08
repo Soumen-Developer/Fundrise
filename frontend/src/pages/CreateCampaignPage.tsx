@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
-import { ArrowRight, ArrowLeft, Sparkles } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Sparkles, AlertCircle } from 'lucide-react';
 import Input from '@/components/input/Input';
 import Button from '@/components/button/Button';
 import api from '@/lib/api';
@@ -22,6 +22,7 @@ const CreateCampaignPage: React.FC = () => {
 
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -40,31 +41,39 @@ const CreateCampaignPage: React.FC = () => {
     if (saved) {
       try {
         setFormData(JSON.parse(saved));
-      } catch (e) {}
+      } catch {}
     }
   }, []);
 
   // Save draft on edit
   const updateForm = (fields: Partial<typeof formData>) => {
+    setErrorMessage(null);
     const next = { ...formData, ...fields };
     setFormData(next);
     localStorage.setItem('fundrise_campaign_draft', JSON.stringify(next));
   };
 
   const handleNext = () => {
+    setErrorMessage(null);
     if (step === 1) {
       if (!formData.title.trim()) {
-        toast('Please enter a campaign title');
+        const msg = 'Please enter a campaign title';
+        setErrorMessage(msg);
+        toast(msg);
         return;
       }
       if (!formData.description.trim()) {
-        toast('Please enter a short description');
+        const msg = 'Please enter a short description';
+        setErrorMessage(msg);
+        toast(msg);
         return;
       }
     }
     if (step === 2) {
       if (!formData.story.trim()) {
-        toast('Please tell your campaign story');
+        const msg = 'Please tell your campaign story';
+        setErrorMessage(msg);
+        toast(msg);
         return;
       }
     }
@@ -72,13 +81,18 @@ const CreateCampaignPage: React.FC = () => {
   };
 
   const handleSubmit = async () => {
+    setErrorMessage(null);
     const goal = parseFloat(formData.goalAmount);
     if (!goal || goal <= 0) {
-      toast('Please enter a valid goal amount');
+      const msg = 'Please enter a valid goal amount';
+      setErrorMessage(msg);
+      toast(msg);
       return;
     }
     if (!formData.deadline) {
-      toast('Please select a deadline date');
+      const msg = 'Please select a deadline date';
+      setErrorMessage(msg);
+      toast(msg);
       return;
     }
 
@@ -107,6 +121,7 @@ const CreateCampaignPage: React.FC = () => {
       }
     } catch (err: any) {
       const errorMsg = err.response?.data?.errors?.[0]?.msg || err.response?.data?.message || 'Error creating campaign';
+      setErrorMessage(errorMsg);
       toast(errorMsg);
     } finally {
       setSubmitting(false);
@@ -164,6 +179,13 @@ const CreateCampaignPage: React.FC = () => {
 
         {/* Form Container */}
         <div className="bg-surface rounded-2xl p-6 sm:p-10 border border-border/50 shadow-sm">
+          {errorMessage && (
+            <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-sm flex items-start gap-3 animate-in fade-in duration-200">
+              <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+              <span className="leading-snug">{errorMessage}</span>
+            </div>
+          )}
+
           {/* STEP 1 */}
           {step === 1 && (
             <div className="space-y-6">
@@ -230,12 +252,50 @@ const CreateCampaignPage: React.FC = () => {
                 />
               </div>
 
-              <Input
-                label="Cover Image URL (Direct Link)"
-                placeholder="https://images.unsplash.com/... or image URL"
-                value={formData.image}
-                onChange={(e) => updateForm({ image: e.target.value })}
-              />
+              <div>
+                <Input
+                  label="Cover Image URL (Direct Link)"
+                  placeholder="https://images.unsplash.com/... or image URL"
+                  value={formData.image}
+                  onChange={(e) => updateForm({ image: e.target.value })}
+                />
+                {formData.image && (
+                  <div className="mt-2 rounded-xl overflow-hidden border border-border/50 max-h-44 bg-surface">
+                    <img
+                      src={formData.image}
+                      alt="Campaign Preview"
+                      className="w-full h-44 object-cover"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1200&auto=format&fit=crop&q=80';
+                      }}
+                    />
+                  </div>
+                )}
+                <div className="mt-2 flex flex-wrap gap-2 text-xs">
+                  <span className="text-text-secondary py-1">Quick Suggestions:</span>
+                  <button
+                    type="button"
+                    onClick={() => updateForm({ image: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1200&auto=format&fit=crop&q=80' })}
+                    className="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:text-primary transition-colors cursor-pointer"
+                  >
+                    📚 Education
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => updateForm({ image: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=1200&auto=format&fit=crop&q=80' })}
+                    className="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:text-primary transition-colors cursor-pointer"
+                  >
+                    🏥 Healthcare
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => updateForm({ image: 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=1200&auto=format&fit=crop&q=80' })}
+                    className="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:text-primary transition-colors cursor-pointer"
+                  >
+                    🌱 Green Earth
+                  </button>
+                </div>
+              </div>
 
               <Input
                 label="Optional Video Link (YouTube or direct MP4)"

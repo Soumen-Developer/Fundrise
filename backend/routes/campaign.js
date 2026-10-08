@@ -143,14 +143,16 @@ router.get('/:id', async (req, res) => {
 router.post(
   '/',
   [
-    ...CAMPAIGN_WHITELIST.map(
-      (field) => body(field).notEmpty().withMessage(`${field} is required`)
-    ),
+    body('title').trim().notEmpty().withMessage('Title is required'),
+    body('description').trim().notEmpty().withMessage('Description is required'),
+    body('story').trim().notEmpty().withMessage('Story is required'),
     body('category')
       .isIn(['education', 'medical', 'startup', 'creative', 'social', 'environment', 'other'])
       .withMessage('Invalid category'),
-    body('goalAmount').isDecimal({ min: 1 }).withMessage('Valid goal amount required'),
+    body('goalAmount').isFloat({ min: 1 }).withMessage('Valid goal amount required'),
     body('deadline').isISO8601().withMessage('Valid deadline required'),
+    body('image').optional().isString(),
+    body('videoUrl').optional().isString(),
   ],
   protect,
   async (req, res) => {

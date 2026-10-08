@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Loader2 } from 'lucide-react';
 import ProgressBar from '@/components/progress-bar/ProgressBar';
 import PresetAmounts from '@/components/preset-amounts/PresetAmounts';
 
@@ -112,9 +113,16 @@ const DonationCard: React.FC<DonationCardProps> = ({
       <button
         onClick={handleDonateClick}
         disabled={isDonating || (!selectedAmount && !customAmount)}
-        className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary-dark transition-colors disabled:cursor-not-allowed disabled:opacity-50 shadow-md"
+        className="w-full bg-primary text-white py-3.5 rounded-xl font-semibold hover:bg-emerald-600 active:scale-[0.98] transition-all cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 disabled:scale-100 shadow-md flex items-center justify-center gap-2"
       >
-        {isDonating ? 'Processing Donation...' : `Donate ₹${(customAmount ? Number(customAmount) : selectedAmount) || 0}`}
+        {isDonating ? (
+          <>
+            <Loader2 className="w-4 h-4 animate-spin" />
+            Processing Donation...
+          </>
+        ) : (
+          `Donate ₹${Number(customAmount ? Number(customAmount) : selectedAmount || 0).toLocaleString()}`
+        )}
       </button>
 
       {/* Trust Text */}

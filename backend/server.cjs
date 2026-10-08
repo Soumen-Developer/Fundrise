@@ -70,10 +70,8 @@ app.use((req, res) => {
 });
 
 // Error handler middleware (after all routes)
-app.use((err, req, res, next) => {
-  console.error('Error handler:', err.message);
-  res.status(500).json({ success: false, message: err.message || 'Internal Server Error' });
-});
+const { errorHandler } = require('./middleware/errorHandler.js');
+app.use(errorHandler);
 
 // Start server
 const PORT = process.env.PORT || 5001;

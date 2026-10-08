@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Search, SlidersHorizontal } from 'lucide-react';
 import CampaignCard from '@/components/campaign-card/CampaignCard';
 import { CampaignCardSkeleton } from '@/components/skeleton/Skeleton';
@@ -14,15 +14,23 @@ const categories = [
   { value: 'creative', label: 'Creative' },
 ];
 
+const getDaysLeft = (deadlineStr?: string) => {
+  if (!deadlineStr) return 14;
+  const diff = new Date(deadlineStr).getTime() - Date.now();
+  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+};
+
 const ExplorePage: React.FC = () => {
   const [campaigns, setCampaigns] = useState<any[]>([]);
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sort, setSort] = useState('newest');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const fetchCampaigns = async () => {
+  const fetchCampaigns = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const params: any = { sort };
       if (selectedCategory !== 'all') {
@@ -36,16 +44,17 @@ const ExplorePage: React.FC = () => {
       if (res.data?.success) {
         setCampaigns(res.data.campaigns || []);
       }
-    } catch (err) {
-      console.warn('Failed to load campaigns, using default view:', err);
+    } catch (err: any) {
+      console.warn('Failed to load campaigns:', err);
+      setError(err.response?.data?.message || 'Could not fetch campaigns from server.');
     } finally {
       setLoading(false);
     }
-  };
+  }, [sort, selectedCategory, search]);
 
   useEffect(() => {
     fetchCampaigns();
-  }, [selectedCategory, sort]);
+  }, [fetchCampaigns]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,7 +111,21 @@ const ExplorePage: React.FC = () => {
         </div>
 
         {/* Campaign List */}
-        {loading ? (
+        {error ? (
+          <div className="text-center py-16 bg-surface rounded-2xl border border-red-200 dark:border-red-900/40 p-8 max-w-md mx-auto shadow-sm">
+            <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-900/30 text-red-600 flex items-center justify-center mx-auto mb-3">
+              <SlidersHorizontal className="w-6 h-6" />
+            </div>
+            <h3 className="font-bold text-lg mb-1 text-text">Unable to Load Fundraisers</h3>
+            <p className="text-sm text-text-secondary mb-5">{error}</p>
+            <button
+              onClick={() => fetchCampaigns()}
+              className="bg-primary text-white text-xs font-semibold px-5 py-2.5 rounded-xl cursor-pointer hover:bg-emerald-600 active:scale-[0.98] transition-all shadow-sm"
+            >
+              Try Again
+            </button>
+          </div>
+        ) : loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[1, 2, 3, 4, 5, 6].map((n) => (
               <CampaignCardSkeleton key={n} />
@@ -125,10 +148,7 @@ const ExplorePage: React.FC = () => {
                 goalAmount={camp.goalAmount}
                 raisedAmount={camp.raisedAmount}
                 backersCount={camp.backersCount}
-                daysLeft={Math.max(
-                  0,
-                  Math.ceil((new Date(camp.deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24)) || 14
-                )}
+                daysLeft={getDaysLeft(camp.deadline)}
                 category={camp.category}
                 image={camp.image}
                 isVerified={camp.isVerified}

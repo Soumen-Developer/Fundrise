@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
+import { AlertCircle, Loader2 } from 'lucide-react';
 import Input from '@/components/input/Input';
 import Button from '@/components/button/Button';
 import { useAuth } from '@/components/auth/AuthProvider';
@@ -11,27 +12,37 @@ const RegisterPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { register } = useAuth();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage(null);
 
     if (!name.trim()) {
-      toast('Please enter your full name');
+      const msg = 'Please enter your full name';
+      setErrorMessage(msg);
+      toast(msg);
       return;
     }
     if (!email.trim()) {
-      toast('Please enter your email address');
+      const msg = 'Please enter your email address';
+      setErrorMessage(msg);
+      toast(msg);
       return;
     }
     if (password.length < 6) {
-      toast('Password must be at least 6 characters');
+      const msg = 'Password must be at least 6 characters';
+      setErrorMessage(msg);
+      toast(msg);
       return;
     }
     if (password !== confirmPassword) {
-      toast('Passwords do not match');
+      const msg = 'Passwords do not match';
+      setErrorMessage(msg);
+      toast(msg);
       return;
     }
 
@@ -42,6 +53,7 @@ const RegisterPage: React.FC = () => {
       navigate('/dashboard');
     } catch (err: any) {
       const msg = err.response?.data?.errors?.[0]?.msg || err.response?.data?.message || 'Registration failed';
+      setErrorMessage(msg);
       toast(msg);
     } finally {
       setLoading(false);
@@ -58,11 +70,21 @@ const RegisterPage: React.FC = () => {
           Create an account to launch campaigns and support causes
         </p>
 
+        {errorMessage && (
+          <div className="mb-5 p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-sm flex items-start gap-2.5 animate-in fade-in duration-200">
+            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+            <span className="leading-snug">{errorMessage}</span>
+          </div>
+        )}
+
         <form onSubmit={handleRegister} className="space-y-4">
           <Input
             placeholder="John Doe"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value);
+              if (errorMessage) setErrorMessage(null);
+            }}
             label="Full Name"
           />
 
@@ -70,7 +92,10 @@ const RegisterPage: React.FC = () => {
             type="email"
             placeholder="name@example.com"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (errorMessage) setErrorMessage(null);
+            }}
             label="Email Address"
           />
 
@@ -78,7 +103,10 @@ const RegisterPage: React.FC = () => {
             type="password"
             placeholder="At least 6 characters"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (errorMessage) setErrorMessage(null);
+            }}
             label="Password"
           />
 
@@ -86,7 +114,10 @@ const RegisterPage: React.FC = () => {
             type="password"
             placeholder="Confirm password"
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            onChange={(e) => {
+              setConfirmPassword(e.target.value);
+              if (errorMessage) setErrorMessage(null);
+            }}
             label="Confirm Password"
           />
 
@@ -94,9 +125,16 @@ const RegisterPage: React.FC = () => {
             type="submit"
             disabled={loading}
             variant="primary"
-            className="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-primary-dark transition-colors"
+            className="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-emerald-600 active:scale-[0.98] transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2"
           >
-            {loading ? 'Creating Account...' : 'Create Account'}
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Creating Account...
+              </>
+            ) : (
+              'Create Account'
+            )}
           </Button>
         </form>
 

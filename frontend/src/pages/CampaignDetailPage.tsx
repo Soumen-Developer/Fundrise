@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
 import { Share2, Calendar, CheckCircle2, User as UserIcon } from 'lucide-react';
@@ -60,6 +60,14 @@ const CampaignDetailPage: React.FC = () => {
   const [newComment, setNewComment] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
   const [isDonating, setIsDonating] = useState(false);
+
+  const daysLeft = useMemo(() => {
+    if (!campaign?.deadline) return 0;
+    return Math.max(
+      0,
+      Math.ceil((new Date(campaign.deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+    );
+  }, [campaign?.deadline]);
 
   useEffect(() => {
     const fetchCampaign = async () => {
@@ -141,7 +149,7 @@ const CampaignDetailPage: React.FC = () => {
       setComments((prev) => [added, ...prev]);
       setNewComment('');
       toast('Comment posted successfully!');
-    } catch (error) {
+    } catch (_error) {
       // Optimistic update for testing
       setComments((prev) => [
         {
@@ -175,7 +183,7 @@ const CampaignDetailPage: React.FC = () => {
       const orderRes = await api.post('/donations/create-order', { amount });
       const orderId = orderRes.data?.orderId || `mock_order_${Date.now()}`;
 
-      // 2. Verify payment (using test mode mock signature)
+      // 2. Verify payment
       const verifyRes = await api.post('/donations/verify', {
         razorpay_order_id: orderId,
         razorpay_payment_id: `pay_mock_${Date.now()}`,
@@ -186,37 +194,24 @@ const CampaignDetailPage: React.FC = () => {
       });
 
       if (verifyRes.data?.success) {
-        toast(`₹${amount} donated successfully to ${campaign.title}!`);
-        // Update campaign state
+        toast(`₹${amount.toLocaleString()} donated successfully! Thank you for your support.`);
+        const updated = verifyRes.data.campaign;
         setCampaign((prev) => {
           if (!prev) return prev;
           return {
             ...prev,
-            raisedAmount: Number(prev.raisedAmount) + Number(amount),
-            backersCount: prev.backersCount + 1,
+            raisedAmount: updated?.raisedAmount ?? Number(prev.raisedAmount) + Number(amount),
+            backersCount: updated?.backersCount ?? prev.backersCount + 1,
+            status: updated?.status ?? prev.status,
           };
         });
       } else {
-        toast(`₹${amount} donated successfully!`);
-        setCampaign((prev) => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            raisedAmount: Number(prev.raisedAmount) + Number(amount),
-            backersCount: prev.backersCount + 1,
-          };
-        });
+        toast(verifyRes.data?.message || 'Donation could not be verified.');
       }
-    } catch (err) {
-      toast(`Test donation of ₹${amount} completed!`);
-      setCampaign((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          raisedAmount: Number(prev.raisedAmount) + Number(amount),
-          backersCount: prev.backersCount + 1,
-        };
-      });
+    } catch (err: any) {
+      console.error('Donation error:', err);
+      const msg = err.response?.data?.message || 'Payment failed. Please try again.';
+      toast(msg);
     } finally {
       setIsDonating(false);
     }
@@ -239,11 +234,6 @@ const CampaignDetailPage: React.FC = () => {
       </div>
     );
   }
-
-  const daysLeft = Math.max(
-    0,
-    Math.ceil((new Date(campaign.deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
-  );
 
   const creatorName = campaign.creator?.name || campaign.User?.name || 'Campaign Creator';
 

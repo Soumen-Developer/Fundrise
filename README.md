@@ -141,6 +141,8 @@ This will create:
 | User | amit@example.com | password123 |
 | User | sunita@example.com | password123 |
 | Admin | admin@fundrise.com | admin123 |
+| Admin | soumen@fundrise.com | soumen123 |
+| Admin | yogiraj@fundrise.com | yogiraj123 |
 
 ## 💳 Razorpay Test Mode
 
@@ -264,7 +266,7 @@ This project is for educational purposes as a college project.
 
 ## 👥 Authors
 
-Your Name - Initial work
+Fundrise - Initial work
 
 ## 🙏 Acknowledgments
 

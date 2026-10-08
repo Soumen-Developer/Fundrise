@@ -13,7 +13,7 @@ router.post(
   '/register',
   [
     body('name').notEmpty().withMessage('Name is required').isLength({ min: 1 }),
-    body('email').isEmail().withMessage('Valid email is required').normalizeEmail(),
+    body('email').isEmail().withMessage('Valid email is required').normalizeEmail({ gmail_remove_dots: false }),
     body('password')
       .isLength({ min: 6 })
       .withMessage('Password must be at least 6 characters'),
@@ -59,7 +59,7 @@ router.post(
 router.post(
   '/login',
   [
-    body('email').isEmail().withMessage('Valid email is required').normalizeEmail(),
+    body('email').isEmail().withMessage('Valid email is required').normalizeEmail({ gmail_remove_dots: false }),
     body('password').notEmpty().withMessage('Password is required'),
   ],
   async (req, res) => {
@@ -75,6 +75,11 @@ router.post(
       const user = await User.findOne({ where: { email } });
       if (!user) {
         return res.status(401).json({ message: 'Invalid email or password' });
+      }
+
+      // Check if account is blocked
+      if (user.isBlocked) {
+        return res.status(403).json({ message: 'This account has been suspended. Please contact support.' });
       }
 
       // Compare password

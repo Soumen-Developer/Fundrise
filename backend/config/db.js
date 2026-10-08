@@ -2,8 +2,15 @@ const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
 const dbUrl = process.env.DATABASE_URL || '';
-const isLocal = dbUrl.includes('localhost') || dbUrl.includes('127.0.0.1') || process.env.DB_HOST === 'localhost';
-const useSSL = (process.env.NODE_ENV === 'production' || dbUrl.includes('render.com')) && !isLocal;
+const isLocal =
+  dbUrl.includes('localhost') ||
+  dbUrl.includes('127.0.0.1') ||
+  dbUrl.includes('host.docker.internal') ||
+  process.env.DB_HOST === 'localhost' ||
+  process.env.DB_HOST === 'host.docker.internal';
+const useSSL =
+  process.env.DB_SSL === 'true' ||
+  (!isLocal && (dbUrl.includes('render.com') || (process.env.NODE_ENV === 'production' && !dbUrl.includes('sslmode=disable'))));
 
 const sequelize = new Sequelize(
   dbUrl || 

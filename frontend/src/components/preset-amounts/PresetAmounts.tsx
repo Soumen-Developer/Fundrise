@@ -19,13 +19,13 @@ const PresetAmounts: React.FC<PresetAmountProps> = ({
         <button
           key={amount}
           onClick={() => onSelect(amount)}
-          className={`flex-1 rounded-lg px-4 py-2 text-sm transition-colors ${
+          className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all cursor-pointer active:scale-95 ${
             selectedAmount === amount
-              ? 'bg-primary text-white'
-              : 'border border-border/50 text-text hover:bg-border/25'
+              ? 'bg-primary text-white shadow-sm'
+              : 'border border-border/50 text-text hover:bg-slate-100 dark:hover:bg-slate-800'
           }`}
         >
-          ₹{amount}
+          ₹{amount.toLocaleString()}
         </button>
       ))}
     </div>

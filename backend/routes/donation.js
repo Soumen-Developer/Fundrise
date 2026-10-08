@@ -159,12 +159,17 @@ router.post(
       }
 
       // Increment campaign raised amount and backer count in transaction
+      const newRaisedAmount = Number(campaign.raisedAmount) + Number(amount);
+      const newBackersCount = Number(campaign.backersCount) + 1;
+      let newStatus = campaign.status;
+
       await sequelize.transaction(async (t) => {
         await campaign.increment('raisedAmount', { by: Number(amount) }, { transaction: t });
         await campaign.increment('backersCount', { by: 1 }, { transaction: t });
 
         // Set campaign Successful if goal is reached
-        if (campaign.raisedAmount >= campaign.goalAmount) {
+        if (newRaisedAmount >= Number(campaign.goalAmount)) {
+          newStatus = 'Successful';
           await campaign.update({ status: 'Successful' }, { transaction: t });
         }
       });
@@ -176,9 +181,9 @@ router.post(
           user: req.user.id,
         },
         campaign: {
-          raisedAmount: campaign.raisedAmount,
-          backersCount: campaign.backersCount,
-          status: campaign.status,
+          raisedAmount: newRaisedAmount,
+          backersCount: newBackersCount,
+          status: newStatus,
         },
       });
     } catch (error) {

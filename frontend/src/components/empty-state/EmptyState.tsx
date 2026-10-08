@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Eye, Heart } from 'lucide-react';
+import { Eye } from 'lucide-react';
 
 interface EmptyStateProps {
   icon?: React.ComponentType<{ className?: string }>;

@@ -16,19 +16,35 @@ import HowItWorksPage from './pages/HowItWorksPage';
 import ContactPage from './pages/ContactPage';
 import NotFoundPage from './pages/NotFoundPage';
 
-const AppContent: React.FC = () => {
-  const { user, role, logout } = useAuth();
+import ErrorBoundary from '@/components/ui/ErrorBoundary';
 
-  // Route guard: redirect if not authenticated
+const AppContent: React.FC = () => {
+  const { user, role, logout, loading } = useAuth();
+
+  // Route guard: wait for auth verification, redirect if not authenticated
   const requireAuth = (element: React.ReactElement) => {
+    if (loading) {
+      return (
+        <div className="min-h-[60vh] flex items-center justify-center">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent" />
+        </div>
+      );
+    }
     if (!user) {
       return <Navigate to="/login" replace />;
     }
     return element;
   };
 
-  // Route guard: redirect if not admin
+  // Route guard: wait for auth verification, redirect if not admin
   const requireAdmin = (element: React.ReactElement) => {
+    if (loading) {
+      return (
+        <div className="min-h-[60vh] flex items-center justify-center">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent" />
+        </div>
+      );
+    }
     if (!user || role !== 'admin') {
       return <Navigate to="/dashboard" replace />;
     }
@@ -78,9 +94,11 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
   return (
     <Router>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
+      <ErrorBoundary>
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
+      </ErrorBoundary>
     </Router>
   );
 };

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
+import { AlertCircle, Shield, User, Loader2 } from 'lucide-react';
 import Input from '@/components/input/Input';
 import Button from '@/components/button/Button';
 import { useAuth } from '@/components/auth/AuthProvider';
@@ -9,28 +10,40 @@ const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { login } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
-      toast('Please enter both email and password');
+    setErrorMessage(null);
+
+    if (!email.trim() || !password) {
+      const msg = 'Please enter both email and password';
+      setErrorMessage(msg);
+      toast(msg);
       return;
     }
 
     setLoading(true);
     try {
-      await login(email, password);
+      await login(email.trim(), password);
       toast('Logged in successfully!');
       navigate('/dashboard');
     } catch (err: any) {
       const msg = err.response?.data?.message || 'Invalid email or password';
+      setErrorMessage(msg);
       toast(msg);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleFillDemo = (demoEmail: string, demoPass: string) => {
+    setEmail(demoEmail);
+    setPassword(demoPass);
+    setErrorMessage(null);
   };
 
   return (
@@ -43,12 +56,22 @@ const LoginPage: React.FC = () => {
           Log in to manage your campaigns and donations
         </p>
 
+        {errorMessage && (
+          <div className="mb-5 p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-sm flex items-start gap-2.5 animate-in fade-in duration-200">
+            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+            <span className="leading-snug">{errorMessage}</span>
+          </div>
+        )}
+
         <form onSubmit={handleLogin} className="space-y-4">
           <Input
             type="email"
             placeholder="name@example.com"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (errorMessage) setErrorMessage(null);
+            }}
             label="Email Address"
           />
 
@@ -56,7 +79,10 @@ const LoginPage: React.FC = () => {
             type="password"
             placeholder="••••••••"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (errorMessage) setErrorMessage(null);
+            }}
             label="Password"
           />
 
@@ -64,9 +90,16 @@ const LoginPage: React.FC = () => {
             type="submit"
             disabled={loading}
             variant="primary"
-            className="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-primary-dark transition-colors"
+            className="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-emerald-600 active:scale-[0.98] transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2"
           >
-            {loading ? 'Logging in...' : 'Log In'}
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Logging in...
+              </>
+            ) : (
+              'Log In'
+            )}
           </Button>
         </form>
 
@@ -77,10 +110,25 @@ const LoginPage: React.FC = () => {
           </Link>
         </div>
 
-        <div className="mt-4 p-3 rounded-lg bg-slate-50 dark:bg-slate-900 text-xs text-text-secondary">
-          <p className="font-semibold text-text mb-1">Demo Accounts:</p>
-          <p>Admin: <code className="text-primary">admin@fundrise.com</code> / <code>admin123</code></p>
-          <p>User: <code className="text-primary">priya@example.com</code> / <code>password123</code></p>
+        {/* Demo Fast Fill */}
+        <div className="mt-5 p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-border/40 text-xs text-text-secondary space-y-2">
+          <p className="font-semibold text-text mb-2">Demo Credentials (Quick Fill):</p>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => handleFillDemo('admin@fundrise.com', 'admin123')}
+              className="flex items-center justify-center gap-1.5 p-2 rounded-lg bg-surface border border-border/60 text-text hover:border-primary hover:text-primary transition-colors text-xs font-medium cursor-pointer"
+            >
+              <Shield className="w-3.5 h-3.5 text-primary" /> Admin Account
+            </button>
+            <button
+              type="button"
+              onClick={() => handleFillDemo('priya@example.com', 'password123')}
+              className="flex items-center justify-center gap-1.5 p-2 rounded-lg bg-surface border border-border/60 text-text hover:border-primary hover:text-primary transition-colors text-xs font-medium cursor-pointer"
+            >
+              <User className="w-3.5 h-3.5 text-primary" /> User Account
+            </button>
+          </div>
         </div>
       </div>
     </div>

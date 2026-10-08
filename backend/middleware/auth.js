@@ -5,7 +5,7 @@ exports.protect = async (req, res, next) => {
   let token;
 
   // Check for jwt cookie first, then Bearer header
-  if (req.cookies.jwt) {
+  if (req.cookies && req.cookies.jwt) {
     try {
       token = req.cookies.jwt;
       const decoded = jwt.verify(token, process.env.JWT_SECRET);

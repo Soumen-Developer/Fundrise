@@ -1,50 +1,50 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useToast } from '@/components/ui/use-toast';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { DollarSign, Heart, Layers, PlusCircle, ExternalLink, Calendar } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { Skeleton } from '@/components/skeleton/Skeleton';
 import api from '@/lib/api';
 
 const UserDashboard: React.FC = () => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
   const { user } = useAuth();
 
   const [myCampaigns, setMyCampaigns] = useState<any[]>([]);
   const [myDonations, setMyDonations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchUserData = useCallback(async () => {
+    if (!user) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const [campsRes, donRes] = await Promise.allSettled([
+        api.get('/campaigns?status=all'),
+        api.get(`/donations/user/${user.id}`),
+      ]);
+
+      if (campsRes.status === 'fulfilled' && campsRes.value.data?.campaigns) {
+        // Filter campaigns created by current user
+        const userCampaigns = campsRes.value.data.campaigns.filter(
+          (c: any) => c.creatorId === user.id || c.creator?.id === user.id
+        );
+        setMyCampaigns(userCampaigns);
+      }
+
+      if (donRes.status === 'fulfilled' && donRes.value.data?.donations) {
+        setMyDonations(donRes.value.data.donations);
+      }
+    } catch (err) {
+      console.warn('Failed to load user dashboard data:', err);
+      setError('Unable to load some dashboard data. Please check your connection.');
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      if (!user) return;
-      setLoading(true);
-      try {
-        const [campsRes, donRes] = await Promise.allSettled([
-          api.get('/campaigns?status=all'),
-          api.get(`/donations/user/${user.id}`),
-        ]);
-
-        if (campsRes.status === 'fulfilled' && campsRes.value.data?.campaigns) {
-          // Filter campaigns created by current user
-          const userCampaigns = campsRes.value.data.campaigns.filter(
-            (c: any) => c.creatorId === user.id || c.creator?.id === user.id
-          );
-          setMyCampaigns(userCampaigns);
-        }
-
-        if (donRes.status === 'fulfilled' && donRes.value.data?.donations) {
-          setMyDonations(donRes.value.data.donations);
-        }
-      } catch (err) {
-        console.warn('Failed to load user dashboard data:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchUserData();
-  }, [user]);
+  }, [fetchUserData]);
 
   const totalRaised = myCampaigns.reduce((sum, c) => sum + Number(c.raisedAmount || 0), 0);
   const totalDonated = myDonations.reduce((sum, d) => sum + Number(d.amount || 0), 0);
@@ -60,11 +60,23 @@ const UserDashboard: React.FC = () => {
           </div>
           <Link
             to="/create-campaign"
-            className="inline-flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-primary-dark transition-colors shadow-sm self-start sm:self-auto"
+            className="inline-flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-emerald-600 active:scale-[0.98] transition-all shadow-sm self-start sm:self-auto cursor-pointer"
           >
             <PlusCircle className="w-4 h-4" /> Start New Campaign
           </Link>
         </div>
+
+        {error && (
+          <div className="mb-8 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-200 flex items-center justify-between gap-4">
+            <p className="text-sm">{error}</p>
+            <button
+              onClick={fetchUserData}
+              className="text-xs font-semibold underline hover:no-underline cursor-pointer"
+            >
+              Retry
+            </button>
+          </div>
+        )}
 
         {/* Stats row */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
