@@ -24,21 +24,28 @@ const useSSL =
       (process.env.NODE_ENV === 'production' && !dbUrl.includes('sslmode=disable'))));
 
 const isProduction = process.env.NODE_ENV === 'production';
-const hasExternalPostgres =
-  Boolean(dbUrl) ||
-  (process.env.DB_HOST &&
-    process.env.DB_HOST !== 'localhost' &&
-    process.env.DB_HOST !== '127.0.0.1');
 
-// Use SQLite if explicitly requested or if running in container without any DB url or remote DB host
+// Check if dbUrl or DB_HOST points to a local address (not reachable inside production container)
+const pointsToLocal =
+  dbUrl.includes('localhost') ||
+  dbUrl.includes('127.0.0.1') ||
+  dbUrl.includes('host.docker.internal') ||
+  process.env.DB_HOST === 'localhost' ||
+  process.env.DB_HOST === '127.0.0.1';
+
+// In production, localhost:5432 will fail because Postgres is not running inside the app container
+const hasValidRemotePostgres =
+  Boolean(dbUrl) && (!isProduction || !pointsToLocal);
+
+// Use SQLite if explicitly requested OR in production without a valid remote database
 const useSqlite =
-  process.env.DB_DIALECT === 'sqlite' || (!hasExternalPostgres && isProduction);
+  process.env.DB_DIALECT === 'sqlite' || (!hasValidRemotePostgres && isProduction);
 
 let sequelize;
 
 if (useSqlite) {
   const sqlitePath = path.resolve(__dirname, '../fundrise.sqlite');
-  console.log(`[DB Config] Using SQLite database at: ${sqlitePath}`);
+  console.log(`[DB Config] Switching to SQLite database at: ${sqlitePath} (production container ready)`);
   sequelize = new Sequelize({
     dialect: 'sqlite',
     storage: sqlitePath,

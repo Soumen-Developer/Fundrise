@@ -47,7 +47,7 @@ app.use('/api/admin', adminRoutes);
 
 // Health check
 let isDbReady = false;
-app.get('/api/health', (req, res) => {
+app.get(['/health', '/api/health'], (req, res) => {
   res.json({
     status: 'ok',
     service: 'fundrise',
