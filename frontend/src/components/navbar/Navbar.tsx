@@ -33,9 +33,9 @@ const Navbar: React.FC<NavbarProps> = ({ user, role, logout }) => {
           <div className="hidden md:flex items-center gap-5">
             <Link to="/explore" className="text-text hover:text-primary transition-colors text-sm font-medium">Explore</Link>
             <Link to="/how-it-works" className="text-text hover:text-primary transition-colors text-sm font-medium">How It Works</Link>
-            <Link to="/demo-payment" className="text-text hover:text-primary transition-colors text-sm font-medium inline-flex items-center gap-1.5">
+            {/* <Link to="/demo-payment" className="text-text hover:text-primary transition-colors text-sm font-medium inline-flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-primary" /> Demo Payment
-            </Link>
+            </Link> */}
             <Link to="/about" className="text-text hover:text-primary transition-colors text-sm font-medium">About</Link>
             <Link to="/contact" className="text-text hover:text-primary transition-colors text-sm font-medium">Contact</Link>
           </div>
