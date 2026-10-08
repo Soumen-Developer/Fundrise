@@ -111,22 +111,44 @@ const LoginPage: React.FC = () => {
         </div>
 
         {/* Demo Fast Fill */}
-        <div className="mt-5 p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-border/40 text-xs text-text-secondary space-y-2">
-          <p className="font-semibold text-text mb-2">Demo Credentials (Quick Fill):</p>
-          <div className="grid grid-cols-2 gap-2">
+        <div className="mt-5 p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-border/40 text-xs text-text-secondary space-y-2.5">
+          <div className="flex items-center justify-between">
+            <span className="font-semibold text-text">Demo Credentials:</span>
+            <span className="text-[11px] text-text-secondary">Click to auto-fill</span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <button
               type="button"
               onClick={() => handleFillDemo('admin@fundrise.com', 'admin123')}
-              className="flex items-center justify-center gap-1.5 p-2 rounded-lg bg-surface border border-border/60 text-text hover:border-primary hover:text-primary transition-colors text-xs font-medium cursor-pointer"
+              className="flex flex-col items-start p-2.5 rounded-lg bg-surface border border-border/60 text-text hover:border-primary hover:text-primary transition-colors text-xs font-medium cursor-pointer text-left"
             >
-              <Shield className="w-3.5 h-3.5 text-primary" /> Admin Account
+              <div className="flex items-center gap-1.5 font-semibold text-text">
+                <Shield className="w-3.5 h-3.5 text-primary" /> Admin
+              </div>
+              <span className="text-[11px] text-text-secondary mt-0.5 truncate w-full">admin@fundrise.com</span>
+              <span className="text-[10px] text-text-secondary/80 font-mono">admin123</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleFillDemo('soumen@fundrise.com', 'soumen123')}
+              className="flex flex-col items-start p-2.5 rounded-lg bg-surface border border-border/60 text-text hover:border-primary hover:text-primary transition-colors text-xs font-medium cursor-pointer text-left"
+            >
+              <div className="flex items-center gap-1.5 font-semibold text-text">
+                <Shield className="w-3.5 h-3.5 text-emerald-500" /> Soumen (Admin)
+              </div>
+              <span className="text-[11px] text-text-secondary mt-0.5 truncate w-full">soumen@fundrise.com</span>
+              <span className="text-[10px] text-text-secondary/80 font-mono">soumen123</span>
             </button>
             <button
               type="button"
               onClick={() => handleFillDemo('priya@example.com', 'password123')}
-              className="flex items-center justify-center gap-1.5 p-2 rounded-lg bg-surface border border-border/60 text-text hover:border-primary hover:text-primary transition-colors text-xs font-medium cursor-pointer"
+              className="flex flex-col items-start p-2.5 rounded-lg bg-surface border border-border/60 text-text hover:border-primary hover:text-primary transition-colors text-xs font-medium cursor-pointer text-left"
             >
-              <User className="w-3.5 h-3.5 text-primary" /> User Account
+              <div className="flex items-center gap-1.5 font-semibold text-text">
+                <User className="w-3.5 h-3.5 text-primary" /> Priya (User)
+              </div>
+              <span className="text-[11px] text-text-secondary mt-0.5 truncate w-full">priya@example.com</span>
+              <span className="text-[10px] text-text-secondary/80 font-mono">password123</span>
             </button>
           </div>
         </div>

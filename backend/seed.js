@@ -5,19 +5,47 @@ const seed = async () => {
   try {
     console.log('Seeding FundRise database with rich demo data...');
 
-    // 1. Create or update Admin
-    const [admin] = await User.findOrCreate({
-      where: { email: 'admin@fundrise.com' },
-      defaults: {
+    // 1. Create or update Admins
+    const adminUsersData = [
+      {
+        email: 'admin@fundrise.com',
         name: 'Admin User',
         password: 'admin123',
         role: 'admin',
         avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&auto=format&fit=crop&q=80',
       },
-    });
-    await admin.update({
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&auto=format&fit=crop&q=80',
-    });
+      {
+        email: 'soumen@fundrise.com',
+        name: 'Soumen Developer',
+        password: 'soumen123',
+        role: 'admin',
+        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
+      },
+      {
+        email: 'yogiraj@fundrise.com',
+        name: 'Yogiraj Admin',
+        password: 'yogiraj123',
+        role: 'admin',
+        avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&auto=format&fit=crop&q=80',
+      },
+    ];
+
+    const admins = [];
+    for (const a of adminUsersData) {
+      let user = await User.findOne({ where: { email: a.email } });
+      if (!user) {
+        user = await User.create(a);
+      } else {
+        user.name = a.name;
+        user.password = a.password;
+        user.role = a.role;
+        user.avatar = a.avatar;
+        user.isBlocked = false;
+        await user.save();
+      }
+      admins.push(user);
+    }
+    const admin = admins[0];
 
     // 2. Create or update Users
     const usersData = [
@@ -53,11 +81,17 @@ const seed = async () => {
 
     const users = [];
     for (const u of usersData) {
-      const [userInstance] = await User.findOrCreate({
-        where: { email: u.email },
-        defaults: u,
-      });
-      await userInstance.update({ avatar: u.avatar });
+      let userInstance = await User.findOne({ where: { email: u.email } });
+      if (!userInstance) {
+        userInstance = await User.create(u);
+      } else {
+        userInstance.name = u.name;
+        userInstance.password = u.password;
+        userInstance.role = u.role;
+        userInstance.avatar = u.avatar;
+        userInstance.isBlocked = false;
+        await userInstance.save();
+      }
       users.push(userInstance);
     }
 
