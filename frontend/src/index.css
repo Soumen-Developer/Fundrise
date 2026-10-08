@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+:root {
+  --primary: #10b981;
+  --primary-dark: #047857;
+  --secondary: #f59e0b;
+  --background: #f8fafc;
+  --dark-background: #0f172a;
+  --surface: #ffffff;
+  --dark-surface: #1e293b;
+  --text: #0f172a;
+  --text-secondary: #64748b;
+  --border: #e2e8f0;
+  --success: #22c55e;
+  --error: #ef4444;
+  --info: #3b82f6;
+}
+
+@theme {
+  --color-primary: #10b981;
+  --color-primary-dark: #047857;
+  --color-secondary: #f59e0b;
+  --color-background: #f8fafc;
+  --color-dark-background: #0f172a;
+  --color-surface: #ffffff;
+  --color-dark-surface: #1e293b;
+  --color-text: #0f172a;
+  --color-text-secondary: #64748b;
+  --color-border: #e2e8f0;
+  --color-success: #22c55e;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+  --font-display: 'Plus Jakarta Sans', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--background);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+button, a, [role="button"] {
+  transition-property: color, background-color, border-color, opacity, transform, box-shadow;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}

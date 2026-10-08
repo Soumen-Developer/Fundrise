@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" role="img" aria-label="Illustration of a heart with a heartbeat line"><title>Illustration of a heart with a heartbeat line</title><rect width="1600" height="900" fill="#F3B6C6"/>
+<circle cx="800" cy="470" r="340" fill="#F8F3EA"/>
+<path fill="#F8F3EA" d="M330 184Q337.84 232.16 386 240Q337.84 247.84 330 296Q322.16 247.84 274 240Q322.16 232.16 330 184Z"/><path fill="#151515" d="M1290 656Q1294.76 685.24 1324 690Q1294.76 694.76 1290 724Q1285.24 694.76 1256 690Q1285.24 685.24 1290 656Z"/>
+<circle cx="1300" cy="240" r="46" fill="#FF5A4F"/>
+<g fill="#151515"><rect x="1270" y="370" width="16" height="60" rx="6"/><rect x="1248" y="392" width="60" height="16" rx="6"/></g>
+<path d="M800 700C540 540 530 300 690 290C760 286 800 340 800 390C800 340 840 286 910 290C1070 300 1060 540 800 700Z" fill="#FF5A4F"/>
+<path d="M150 480H560L610 395L665 575L715 480H885L935 370L990 600L1040 480H1450" fill="none" stroke="#151515" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/></svg>

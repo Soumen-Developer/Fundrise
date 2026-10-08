@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" role="img" aria-label="Illustration of a science flask, test tubes and a magnifier"><title>Illustration of a science flask, test tubes and a magnifier</title><rect width="1600" height="900" fill="#9AAAC2"/>
+<path d="M260 900A540 540 0 0 1 1340 900Z" fill="#F8F3EA"/>
+<path fill="#F8F3EA" d="M1270 146Q1278.96 201.04 1334 210Q1278.96 218.96 1270 274Q1261.04 218.96 1206 210Q1261.04 201.04 1270 146Z"/><path fill="#F8F3EA" d="M330 190Q335.6 224.4 370 230Q335.6 235.6 330 270Q324.4 235.6 290 230Q324.4 224.4 330 190Z"/>
+<rect x="250" y="680" width="270" height="34" rx="10" fill="#151515"/>
+<g stroke="#151515" stroke-width="10">
+  <rect x="282" y="450" width="50" height="250" rx="25" fill="#F8F3EA"/>
+  <rect x="362" y="420" width="50" height="280" rx="25" fill="#F8F3EA"/>
+  <rect x="442" y="470" width="50" height="230" rx="25" fill="#F8F3EA"/>
+</g>
+<rect x="287" y="590" width="40" height="105" rx="20" fill="#F3B6C6"/>
+<rect x="367" y="540" width="40" height="155" rx="20" fill="#FF5A4F"/>
+<rect x="447" y="610" width="40" height="85" rx="20" fill="#E8D8C8"/>
+<path d="M740 300H860V470L1040 800H560L740 470Z" fill="#151515" stroke="#151515" stroke-width="30" stroke-linejoin="round"/>
+<rect x="715" y="270" width="170" height="40" rx="14" fill="#151515"/>
+<path d="M667 640H933L1000 768H600Z" fill="#FF5A4F" stroke="#FF5A4F" stroke-width="16" stroke-linejoin="round"/>
+<circle cx="740" cy="700" r="16" fill="#F8F3EA"/><circle cx="830" cy="725" r="11" fill="#F8F3EA"/><circle cx="880" cy="680" r="8" fill="#F8F3EA"/>
+<circle cx="805" cy="225" r="18" fill="#F3B6C6"/><circle cx="845" cy="170" r="12" fill="#F3B6C6"/><circle cx="790" cy="125" r="8" fill="#F3B6C6"/>
+<circle cx="1180" cy="520" r="92" fill="#F8F3EA" stroke="#151515" stroke-width="28"/>
+<path d="M1248 588L1350 690" stroke="#151515" stroke-width="40" stroke-linecap="round"/>
+<path d="M1140 480A55 55 0 0 1 1200 465" fill="none" stroke="#9AAAC2" stroke-width="14" stroke-linecap="round"/></svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="FundRise icon">
+  <rect width="100" height="100" rx="24" fill="#151515"/>
+  <g transform="translate(0 3)">
+    <path d="M70 38H38a8 8 0 0 0 0 16h24a8 8 0 0 1 0 16H38a8 8 0 0 0 0 16h32" fill="none" stroke="#F8F3EA" stroke-width="10"/>
+    <path d="M50 6Q52.5 17.5 62 20Q52.5 22.5 50 34Q47.5 22.5 38 20Q47.5 17.5 50 6Z" fill="#F8F3EA"/>
+  </g>
+</svg>

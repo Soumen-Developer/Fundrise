@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" role="img" aria-label="Illustration of a solar panel, the sun and a drop of clean water"><title>Illustration of a solar panel, the sun and a drop of clean water</title><rect width="1600" height="900" fill="#FF5A4F"/>
+<circle cx="1210" cy="250" r="120" fill="#F8F3EA"/>
+<path fill="#F8F3EA" d="M980 116Q986.16 153.84 1024 160Q986.16 166.16 980 204Q973.84 166.16 936 160Q973.84 153.84 980 116Z"/><path fill="#151515" d="M240 164Q245.04 194.96 276 200Q245.04 205.04 240 236Q234.96 205.04 204 200Q234.96 194.96 240 164Z"/>
+<g stroke="#F8F3EA" stroke-width="14" stroke-linecap="round">
+  <path d="M1210 70V100"/><path d="M1210 400V430"/><path d="M1030 250H1060"/><path d="M1360 250H1390"/>
+</g>
+<path d="M560 760V860" stroke="#151515" stroke-width="34" stroke-linecap="round"/>
+<path d="M330 520H830L760 760H260Z" fill="#151515" stroke="#151515" stroke-width="20" stroke-linejoin="round"/>
+<g stroke="#9AAAC2" stroke-width="8">
+  <path d="M455 520L398 760"/><path d="M580 520L527 760"/><path d="M705 520L655 760"/>
+  <path d="M310 600H805"/><path d="M290 680H785"/>
+</g>
+<path d="M1120 430C1120 430 1250 570 1250 650A130 130 0 0 1 990 650C990 570 1120 430 1120 430Z" fill="#9AAAC2"/>
+<ellipse cx="1065" cy="650" rx="22" ry="40" fill="#F8F3EA" opacity=".8"/>
+<path d="M0 850Q200 800 400 850T800 850T1200 850T1600 850" fill="none" stroke="#F8F3EA" stroke-width="24"/></svg>
