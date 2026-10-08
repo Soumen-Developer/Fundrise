@@ -3,14 +3,14 @@ databases:
   - name: fundrise-db
     databaseName: fundrise
     user: fundrise
-    region: oregon
+    region: singapore
     plan: free
 
 services:
   - type: web
     name: fundrise-web
     runtime: docker
-    region: oregon
+    region: singapore
     plan: free
     dockerfilePath: ./Dockerfile
     dockerContext: .
