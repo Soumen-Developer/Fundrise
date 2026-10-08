@@ -170,8 +170,12 @@ router.post(
           return obj;
         }, {});
 
-      whitelistedData.status = 'Pending';
+      // Ensure campaign is immediately Active so it appears on Explore and Home
+      whitelistedData.status = req.body.status || 'Active';
       whitelistedData.creatorId = req.user.id;
+      if (req.user.role === 'admin') {
+        whitelistedData.isVerified = true;
+      }
 
       const campaign = await Campaign.create(whitelistedData);
 

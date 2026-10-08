@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
-import { ArrowRight, ArrowLeft, Sparkles, AlertCircle } from 'lucide-react';
+import {
+  ArrowRight,
+  ArrowLeft,
+  Sparkles,
+  AlertCircle,
+  CheckCircle2,
+  Copy,
+  Check,
+  ExternalLink,
+  PlusCircle,
+  CreditCard,
+} from 'lucide-react';
 import Input from '@/components/input/Input';
 import Button from '@/components/button/Button';
 import api from '@/lib/api';
@@ -23,6 +34,8 @@ const CreateCampaignPage: React.FC = () => {
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [createdCampaign, setCreatedCampaign] = useState<any | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -111,10 +124,10 @@ const CreateCampaignPage: React.FC = () => {
 
       const res = await api.post('/campaigns', payload);
       if (res.data?.success) {
-        toast('Campaign created successfully! Submitted for review.');
+        toast('Campaign created successfully! Published and live.');
         localStorage.removeItem('fundrise_campaign_draft');
-        const newId = res.data.campaign?.id;
-        navigate(newId ? `/campaign/${newId}` : '/dashboard');
+        setCreatedCampaign(res.data.campaign);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         toast('Campaign submitted for review!');
         navigate('/explore');
@@ -127,6 +140,136 @@ const CreateCampaignPage: React.FC = () => {
       setSubmitting(false);
     }
   };
+
+  const handleCopyLink = () => {
+    if (!createdCampaign) return;
+    const url = `${window.location.origin}/campaign/${createdCampaign.id}`;
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    toast('Campaign URL copied to clipboard!');
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleResetForm = () => {
+    setCreatedCampaign(null);
+    setStep(1);
+    setFormData({
+      title: '',
+      description: '',
+      category: 'education',
+      story: '',
+      image: '',
+      videoUrl: '',
+      goalAmount: '50000',
+      deadline: new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0],
+    });
+  };
+
+  if (createdCampaign) {
+    return (
+      <div className="py-12">
+        <div className="max-w-2xl mx-auto px-6">
+          <div className="bg-surface rounded-3xl p-8 sm:p-10 border border-border/60 shadow-xl text-center space-y-6 animate-in zoom-in-95 duration-300">
+            {/* Celebration Badge */}
+            <div className="w-20 h-20 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center mx-auto ring-8 ring-emerald-500/5">
+              <CheckCircle2 className="w-12 h-12" />
+            </div>
+
+            <div>
+              <span className="text-xs font-semibold uppercase tracking-wider text-emerald-600 bg-emerald-500/10 px-3.5 py-1 rounded-full">
+                Campaign Published Successfully
+              </span>
+              <h1 className="font-display text-3xl font-extrabold text-text mt-3">
+                Your Fundraiser is Live! 🎉
+              </h1>
+              <p className="text-sm text-text-secondary mt-2">
+                Your campaign has been published and is immediately discoverable. Donors can start making contributions right away.
+              </p>
+            </div>
+
+            {/* Campaign Summary Card */}
+            <div className="bg-slate-50 dark:bg-slate-900/60 p-5 rounded-2xl border border-border/50 text-left space-y-3">
+              <div className="flex items-center gap-3">
+                {createdCampaign.image && (
+                  <img
+                    src={createdCampaign.image}
+                    alt={createdCampaign.title}
+                    className="w-14 h-14 rounded-xl object-cover flex-shrink-0"
+                  />
+                )}
+                <div>
+                  <h3 className="font-bold text-base text-text line-clamp-1">{createdCampaign.title}</h3>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="capitalize text-xs font-semibold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full border border-primary/20">
+                      {createdCampaign.category}
+                    </span>
+                    <span className="text-xs text-text-secondary">
+                      Goal: <strong className="text-text font-bold">₹{Number(createdCampaign.goalAmount).toLocaleString()}</strong>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Shareable Link Box */}
+              <div className="pt-2 border-t border-border/40">
+                <label className="text-[11px] font-semibold text-text-secondary uppercase tracking-wider block mb-1">
+                  Shareable Campaign URL
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={`${window.location.origin}/campaign/${createdCampaign.id}`}
+                    className="flex-1 px-3 py-2 text-xs rounded-xl border border-border/60 bg-background font-mono text-text select-all"
+                  />
+                  <button
+                    onClick={handleCopyLink}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-surface border border-border/60 text-xs font-semibold hover:border-primary text-text hover:text-primary transition-colors cursor-pointer"
+                  >
+                    {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copied ? 'Copied' : 'Copy'}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="space-y-3 pt-2">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link
+                  to={`/campaign/${createdCampaign.id}`}
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-primary text-white hover:bg-emerald-600 text-xs font-semibold transition-all shadow-md active:scale-95"
+                >
+                  View Live Campaign <ExternalLink className="w-3.5 h-3.5" />
+                </Link>
+                <Link
+                  to={`/demo-payment?campaignId=${createdCampaign.id}&amount=500`}
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 text-xs font-semibold transition-all active:scale-95"
+                >
+                  <CreditCard className="w-3.5 h-3.5" /> Test Demo Payment
+                </Link>
+              </div>
+
+              <div className="flex justify-between items-center pt-2 text-xs">
+                <Link
+                  to="/dashboard"
+                  className="text-text-secondary hover:text-primary font-medium transition-colors"
+                >
+                  ← Go to Creator Dashboard
+                </Link>
+                <button
+                  onClick={handleResetForm}
+                  className="text-primary font-semibold hover:underline cursor-pointer inline-flex items-center gap-1"
+                >
+                  <PlusCircle className="w-3.5 h-3.5" /> Create Another Campaign
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="py-10">
@@ -264,6 +407,7 @@ const CreateCampaignPage: React.FC = () => {
                     <img
                       src={formData.image}
                       alt="Campaign Preview"
+                      referrerPolicy="no-referrer"
                       className="w-full h-44 object-cover"
                       onError={(e) => {
                         (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1200&auto=format&fit=crop&q=80';
@@ -341,20 +485,29 @@ const CreateCampaignPage: React.FC = () => {
               </div>
 
               {/* Review summary */}
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-border/40 text-sm space-y-2">
-                <p className="font-semibold text-text flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-primary" /> Campaign Summary Preview
-                </p>
-                <p>
-                  <strong>Title:</strong> {formData.title || 'Untitled'}
-                </p>
-                <p>
-                  <strong>Category:</strong> <span className="capitalize">{formData.category}</span>
-                </p>
-                <p>
-                  <strong>Target:</strong> ₹{Number(formData.goalAmount || 0).toLocaleString()} by{' '}
-                  {formData.deadline}
-                </p>
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-sm space-y-2.5 shadow-sm">
+                <div className="flex items-center gap-2 font-semibold text-slate-900 dark:text-white pb-2 border-b border-slate-200 dark:border-slate-700">
+                  <Sparkles className="w-4 h-4 text-primary flex-shrink-0" />
+                  <span>Campaign Summary Preview</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1 text-slate-700 dark:text-slate-200">
+                  <div>
+                    <span className="text-xs text-text-secondary block">Campaign Title</span>
+                    <span className="font-medium text-slate-900 dark:text-white">{formData.title || 'Untitled'}</span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-text-secondary block">Category</span>
+                    <span className="font-medium capitalize text-slate-900 dark:text-white">{formData.category}</span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-text-secondary block">Target Goal</span>
+                    <span className="font-bold text-primary">₹{Number(formData.goalAmount || 0).toLocaleString()}</span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-text-secondary block">Deadline</span>
+                    <span className="font-medium text-slate-900 dark:text-white">{formData.deadline}</span>
+                  </div>
+                </div>
               </div>
 
               <div className="flex justify-between pt-4">

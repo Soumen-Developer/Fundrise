@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Sparkles } from 'lucide-react';
 import ProgressBar from '@/components/progress-bar/ProgressBar';
 import PresetAmounts from '@/components/preset-amounts/PresetAmounts';
 
@@ -125,9 +125,20 @@ const DonationCard: React.FC<DonationCardProps> = ({
         )}
       </button>
 
+      {/* Test Mode Trigger */}
+      <div className="mt-2.5 text-center">
+        <button
+          type="button"
+          onClick={handleDonateClick}
+          className="text-xs text-primary font-semibold hover:underline inline-flex items-center gap-1 cursor-pointer"
+        >
+          <Sparkles className="w-3.5 h-3.5" /> Razorpay Test Mode (Simulate Payment)
+        </button>
+      </div>
+
       {/* Trust Text */}
-      <p className="mt-4 text-xs text-center text-text-secondary">
-        🔒 Verified campaign. Test payments supported via Razorpay.
+      <p className="mt-3 text-xs text-center text-text-secondary">
+        🔒 Verified campaign. Instant simulated receipt available.
       </p>
     </div>
   );

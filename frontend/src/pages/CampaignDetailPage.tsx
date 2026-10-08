@@ -1,12 +1,14 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
-import { Share2, Calendar, CheckCircle2, User as UserIcon } from 'lucide-react';
+import { Share2, Calendar, CheckCircle2, User as UserIcon, Sparkles, ExternalLink } from 'lucide-react';
 import DonationCard from '@/components/donation-card/DonationCard';
 import CommentItem from '@/components/comment/Comment';
 import { CampaignDetailSkeleton } from '@/components/skeleton/Skeleton';
+import DemoPaymentModal from '@/components/payment/DemoPaymentModal';
 import api from '@/lib/api';
 import { useAuth } from '@/components/auth/AuthProvider';
+import { handleImageError, categoryFallbacks, defaultImage } from '@/lib/imageFallback';
 
 interface Comment {
   id: number;
@@ -56,6 +58,7 @@ const CampaignDetailPage: React.FC = () => {
 
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [loading, setLoading] = useState(true);
+  const [bannerLoaded, setBannerLoaded] = useState(false);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
@@ -168,7 +171,11 @@ const CampaignDetailPage: React.FC = () => {
     }
   };
 
-  const handleDonate = async (amount: number, isAnonymous: boolean) => {
+  const [demoModalOpen, setDemoModalOpen] = useState(false);
+  const [donateAmount, setDonateAmount] = useState<number>(500);
+  const [donateIsAnon, setDonateIsAnon] = useState(false);
+
+  const handleDonate = (amount: number, isAnonymous: boolean) => {
     if (!campaign) return;
 
     if (!user) {
@@ -177,44 +184,9 @@ const CampaignDetailPage: React.FC = () => {
       return;
     }
 
-    setIsDonating(true);
-    try {
-      // 1. Create order
-      const orderRes = await api.post('/donations/create-order', { amount });
-      const orderId = orderRes.data?.orderId || `mock_order_${Date.now()}`;
-
-      // 2. Verify payment
-      const verifyRes = await api.post('/donations/verify', {
-        razorpay_order_id: orderId,
-        razorpay_payment_id: `pay_mock_${Date.now()}`,
-        razorpay_signature: 'mock_signature_for_test_mode',
-        campaignId: campaign.id,
-        amount,
-        isAnonymous,
-      });
-
-      if (verifyRes.data?.success) {
-        toast(`₹${amount.toLocaleString()} donated successfully! Thank you for your support.`);
-        const updated = verifyRes.data.campaign;
-        setCampaign((prev) => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            raisedAmount: updated?.raisedAmount ?? Number(prev.raisedAmount) + Number(amount),
-            backersCount: updated?.backersCount ?? prev.backersCount + 1,
-            status: updated?.status ?? prev.status,
-          };
-        });
-      } else {
-        toast(verifyRes.data?.message || 'Donation could not be verified.');
-      }
-    } catch (err: any) {
-      console.error('Donation error:', err);
-      const msg = err.response?.data?.message || 'Payment failed. Please try again.';
-      toast(msg);
-    } finally {
-      setIsDonating(false);
-    }
+    setDonateAmount(amount);
+    setDonateIsAnon(isAnonymous);
+    setDemoModalOpen(true);
   };
 
   if (loading) {
@@ -268,16 +240,22 @@ const CampaignDetailPage: React.FC = () => {
           {/* Left Column (2 spans) */}
           <div className="lg:col-span-2 space-y-8">
             {/* Media Banner */}
-            {/* Media Banner */}
-            <div className="rounded-2xl overflow-hidden border border-border/50 bg-surface shadow-sm">
+            <div className="rounded-2xl overflow-hidden border border-border/50 bg-surface shadow-sm relative h-80 md:h-[440px]">
+              {!bannerLoaded && (
+                <div className="absolute inset-0 shimmer-card z-0" />
+              )}
               <img
-                src={campaign.image || 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb9?w=1200&auto=format&fit=crop&q=80'}
+                src={campaign.image || categoryFallbacks[campaign.category?.toLowerCase()] || defaultImage}
                 alt={campaign.title}
+                referrerPolicy="no-referrer"
+                onLoad={() => setBannerLoaded(true)}
                 onError={(e) => {
-                  const target = e.currentTarget as HTMLImageElement;
-                  target.src = 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb9?w=1200&auto=format&fit=crop&q=80';
+                  setBannerLoaded(true);
+                  handleImageError(e, campaign.category, campaign.title);
                 }}
-                className="w-full h-80 md:h-[440px] object-cover"
+                className={`w-full h-full object-cover transition-opacity duration-300 relative z-10 ${
+                  bannerLoaded ? 'opacity-100' : 'opacity-0'
+                }`}
               />
             </div>
 
@@ -377,9 +355,50 @@ const CampaignDetailPage: React.FC = () => {
               onDonate={handleDonate}
               isDonating={isDonating}
             />
+
+            {/* Demo Payment Link Card */}
+            <div className="mt-4 p-4 rounded-2xl bg-primary/5 border border-primary/20 text-center">
+              <div className="flex items-center justify-center gap-1.5 text-xs font-semibold text-primary mb-1">
+                <Sparkles className="w-3.5 h-3.5" /> Razorpay Test Mode Simulator
+              </div>
+              <p className="text-xs text-text-secondary mb-3">
+                Experience simulated UPI, Cards, and NetBanking checkout with test receipts.
+              </p>
+              <Link
+                to={`/demo-payment?campaignId=${campaign.id}&amount=500`}
+                className="inline-flex items-center justify-center gap-1.5 w-full py-2.5 px-3 rounded-xl bg-surface border border-primary/30 text-primary hover:bg-primary/10 text-xs font-semibold transition-all cursor-pointer shadow-xs"
+              >
+                Open Demo Payment Portal <ExternalLink className="w-3.5 h-3.5" />
+              </Link>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Interactive Demo Payment Modal */}
+      {demoModalOpen && campaign && (
+        <DemoPaymentModal
+          isOpen={demoModalOpen}
+          onClose={() => setDemoModalOpen(false)}
+          campaignId={campaign.id}
+          campaignTitle={campaign.title}
+          amount={donateAmount}
+          isAnonymous={donateIsAnon}
+          onSuccess={(data) => {
+            const updated = data.campaign;
+            setCampaign((prev) => {
+              if (!prev) return prev;
+              return {
+                ...prev,
+                raisedAmount: updated?.raisedAmount ?? Number(prev.raisedAmount) + Number(donateAmount),
+                backersCount: updated?.backersCount ?? prev.backersCount + 1,
+                status: updated?.status ?? prev.status,
+              };
+            });
+            toast(`₹${donateAmount.toLocaleString()} donated successfully!`);
+          }}
+        />
+      )}
     </div>
   );
 };

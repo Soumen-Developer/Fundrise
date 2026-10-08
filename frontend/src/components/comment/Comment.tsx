@@ -24,9 +24,13 @@ const Comment: React.FC<CommentProps> = ({
       <div className="flex items-start gap-3">
         <div className="flex-shrink-0">
           <img
-            src={userAvatar}
+            src={userAvatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80'}
             alt={userName}
-            className="w-8 h-8 rounded-full object-cover"
+            referrerPolicy="no-referrer"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80';
+            }}
+            className="w-8 h-8 rounded-full object-cover bg-slate-100 dark:bg-slate-800"
             loading="lazy"
           />
         </div>

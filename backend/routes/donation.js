@@ -200,7 +200,7 @@ router.get('/:id', protect, async (req, res) => {
     const donation = await Donation.findByPk(req.params.id, {
       include: [
         { model: User, attributes: ['id', 'name', 'avatar'] },
-        { model: Campaign, attributes: ['id', 'title'] },
+        { model: Campaign, as: 'campaign', attributes: ['id', 'title', 'image', 'category'] },
       ],
     });
 
@@ -229,7 +229,11 @@ router.get('/user/:userId', protect, async (req, res) => {
     const donations = await Donation.findAll({
       where: { userId: req.params.userId },
       include: [
-        { model: Campaign, attributes: ['title', 'goalAmount', 'raisedAmount', 'status'] },
+        {
+          model: Campaign,
+          as: 'campaign',
+          attributes: ['id', 'title', 'image', 'category', 'goalAmount', 'raisedAmount', 'status'],
+        },
       ],
       order: [['createdAt', 'DESC']],
     });

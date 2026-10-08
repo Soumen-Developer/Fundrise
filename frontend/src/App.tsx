@@ -14,7 +14,11 @@ import AdminDashboard from './pages/AdminDashboard';
 import AboutPage from './pages/AboutPage';
 import HowItWorksPage from './pages/HowItWorksPage';
 import ContactPage from './pages/ContactPage';
+import TermsPage from './pages/TermsPage';
+import PrivacyPage from './pages/PrivacyPage';
+import DemoPaymentPage from './pages/DemoPaymentPage';
 import NotFoundPage from './pages/NotFoundPage';
+import { PageLoader } from '@/components/ui/Loader';
 
 import ErrorBoundary from '@/components/ui/ErrorBoundary';
 
@@ -24,11 +28,7 @@ const AppContent: React.FC = () => {
   // Route guard: wait for auth verification, redirect if not authenticated
   const requireAuth = (element: React.ReactElement) => {
     if (loading) {
-      return (
-        <div className="min-h-[60vh] flex items-center justify-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent" />
-        </div>
-      );
+      return <PageLoader message="Verifying authentication..." />;
     }
     if (!user) {
       return <Navigate to="/login" replace />;
@@ -39,11 +39,7 @@ const AppContent: React.FC = () => {
   // Route guard: wait for auth verification, redirect if not admin
   const requireAdmin = (element: React.ReactElement) => {
     if (loading) {
-      return (
-        <div className="min-h-[60vh] flex items-center justify-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent" />
-        </div>
-      );
+      return <PageLoader message="Verifying administrator permissions..." />;
     }
     if (!user || role !== 'admin') {
       return <Navigate to="/dashboard" replace />;
@@ -63,6 +59,9 @@ const AppContent: React.FC = () => {
             <Route path="/about" element={<AboutPage />} />
             <Route path="/how-it-works" element={<HowItWorksPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/demo-payment" element={<DemoPaymentPage />} />
 
             {/* Protected routes */}
             <Route

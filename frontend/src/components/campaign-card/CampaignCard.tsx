@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Users, Clock, CheckCircle } from 'lucide-react';
 import ProgressBar from '@/components/progress-bar/ProgressBar';
+import { handleImageError, categoryFallbacks, defaultImage } from '@/lib/imageFallback';
 
 interface CampaignCardProps {
   id?: number | string;
@@ -17,17 +18,6 @@ interface CampaignCardProps {
   onDonate?: () => void;
 }
 
-const categoryFallbacks: Record<string, string> = {
-  education: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800&auto=format&fit=crop&q=80',
-  medical: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=800&auto=format&fit=crop&q=80',
-  startup: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&auto=format&fit=crop&q=80',
-  environment: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&auto=format&fit=crop&q=80',
-  creative: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800&auto=format&fit=crop&q=80',
-  social: 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb9?w=800&auto=format&fit=crop&q=80',
-};
-
-const defaultFallback = 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb9?w=800&auto=format&fit=crop&q=80';
-
 const CampaignCard: React.FC<CampaignCardProps> = ({
   id,
   title,
@@ -41,28 +31,34 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
   isVerified = false,
   onDonate,
 }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
   const percentage = goalAmount > 0 ? (raisedAmount / goalAmount) * 100 : 0;
   const targetLink = id ? `/campaign/${id}` : '#';
-  const fallback = categoryFallbacks[category?.toLowerCase()] || defaultFallback;
+  const fallback = categoryFallbacks[category?.toLowerCase()] || defaultImage;
 
   return (
     <div className="group rounded-2xl overflow-hidden border border-border/50 bg-surface shadow-sm hover:shadow-md transition-all flex flex-col h-full">
       {/* Image Banner */}
       <Link to={targetLink} className="relative h-48 overflow-hidden block bg-slate-100 dark:bg-slate-800">
+        {!imageLoaded && (
+          <div className="absolute inset-0 shimmer-card z-0" />
+        )}
         <img
           src={image || fallback}
           alt={title}
+          referrerPolicy="no-referrer"
+          onLoad={() => setImageLoaded(true)}
           onError={(e) => {
-            const target = e.currentTarget as HTMLImageElement;
-            if (target.src !== fallback) {
-              target.src = fallback;
-            }
+            setImageLoaded(true);
+            handleImageError(e, category, title);
           }}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          className={`w-full h-full object-cover group-hover:scale-105 transition-all duration-300 relative z-10 ${
+            imageLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
           loading="lazy"
         />
-        <div className="absolute top-3 left-3 flex items-center gap-2">
-          <span className="capitalize px-2.5 py-1 text-xs font-semibold rounded-full bg-white/90 text-text shadow-sm dark:bg-slate-900/90">
+        <div className="absolute top-3 left-3 flex items-center gap-2 z-20">
+          <span className="capitalize px-3 py-1 text-xs font-semibold rounded-full bg-slate-900/85 text-white shadow-md backdrop-blur-md border border-white/20">
             {category}
           </span>
           {isVerified && (
@@ -104,12 +100,21 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
             <span className="text-text-secondary flex items-center gap-1">
               <Clock className="w-3.5 h-3.5" /> {daysLeft} days left
             </span>
-            <Link
-              to={targetLink}
-              className="font-semibold text-primary hover:text-primary-dark transition-colors"
-            >
-              View Campaign →
-            </Link>
+            <div className="flex items-center gap-2.5">
+              <Link
+                to={id ? `/demo-payment?campaignId=${id}&amount=500` : '/demo-payment'}
+                className="font-semibold text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 transition-colors"
+                title="Simulate donation via Demo Payment"
+              >
+                Donate
+              </Link>
+              <Link
+                to={targetLink}
+                className="font-semibold text-primary hover:text-primary-dark transition-colors"
+              >
+                View →
+              </Link>
+            </div>
           </div>
         </div>
       </div>
